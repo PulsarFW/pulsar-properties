@@ -18,7 +18,7 @@ jobs:
       - name: Bundle files
         run: |
           mkdir -p ./temp/pulsar-properties
-          rsync -a --exclude='.git/' --exclude='.github/' ./ ./temp/pulsar-properties/
+          rsync -a --exclude='.github/' ./ ./temp/pulsar-properties/
           cd ./temp && zip -r ../pulsar-properties.zip ./pulsar-properties
 
       - name: Create release
