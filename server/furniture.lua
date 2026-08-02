@@ -1,13 +1,13 @@
 _loadedFurniture = {}
 
 function CreateFurnitureCallbacks()
-    exports["pulsar-core"]:RegisterServerCallback("Properties:PlaceFurniture", function(source, data, cb)
-        local char = exports['pulsar-characters']:FetchCharacterSource(source)
+    plsr.Callbacks:RegisterServerCallback("Properties:PlaceFurniture", function(source, data, cb)
+        local char = plsr.Fetch:CharacterSource(source)
         if char then
             local insideProperty = GlobalState[string.format("%s:Property", source)]
             if insideProperty and data.model and data.coords and data.rotation then
                 local property = _properties[insideProperty]
-                if property and (property.keys ~= nil and property.keys[char:GetData("ID")]) and _loadedFurniture[property.id] and property.keys[char:GetData("ID")] ~= nil and ((property.keys[char:GetData("ID")].Permissions and property.keys[char:GetData("ID")].Permissions.furniture) or property.keys[char:GetData("ID")].Owner) then
+                if property and (property.keys ~= nil and property.keys[char:GetData("ID")]) and _loadedFurniture[property.id]  and property.keys[char:GetData("ID")] ~= nil and (property.keys[char:GetData("ID")].Permissions?.furniture or property.keys[char:GetData("ID")].Owner) then
                     local fData = FurnitureConfig[data.model]
                     if fData then
                         local currentId = 0
@@ -36,8 +36,7 @@ function CreateFurnitureCallbacks()
                         if updated then
                             if _insideProperties[property.id] then
                                 for k, v in pairs(_insideProperties[property.id]) do
-                                    TriggerClientEvent("Furniture:Client:AddItem", k, property.id,
-                                        #_loadedFurniture[property.id], addedItem)
+                                    TriggerClientEvent("Furniture:Client:AddItem", k, property.id, #_loadedFurniture[property.id], addedItem)
                                 end
                             end
 
@@ -52,13 +51,13 @@ function CreateFurnitureCallbacks()
         cb(false)
     end)
 
-    exports["pulsar-core"]:RegisterServerCallback("Properties:MoveFurniture", function(source, data, cb)
-        local char = exports['pulsar-characters']:FetchCharacterSource(source)
+    plsr.Callbacks:RegisterServerCallback("Properties:MoveFurniture", function(source, data, cb)
+        local char = plsr.Fetch:CharacterSource(source)
         if char then
             local insideProperty = GlobalState[string.format("%s:Property", source)]
             if insideProperty and data.id and data.coords and data.rotation then
                 local property = _properties[insideProperty]
-                if property and (property.keys ~= nil and property.keys[char:GetData("ID")]) and _loadedFurniture[property.id] and property.keys[char:GetData("ID")] ~= nil and ((property.keys[char:GetData("ID")].Permissions and property.keys[char:GetData("ID")].Permissions.furniture) or property.keys[char:GetData("ID")].Owner) then
+                if property and (property.keys ~= nil and property.keys[char:GetData("ID")]) and _loadedFurniture[property.id] and property.keys[char:GetData("ID")] ~= nil and (property.keys[char:GetData("ID")].Permissions?.furniture or property.keys[char:GetData("ID")].Owner) then
                     local index = 0
                     for k, v in ipairs(_loadedFurniture[property.id]) do
                         if v.id == data.id then
@@ -80,8 +79,7 @@ function CreateFurnitureCallbacks()
                         if updated then
                             if _insideProperties[property.id] then
                                 for k, v in pairs(_insideProperties[property.id]) do
-                                    TriggerClientEvent("Furniture:Client:MoveItem", k, property.id, data.id,
-                                        _loadedFurniture[property.id][index])
+                                    TriggerClientEvent("Furniture:Client:MoveItem", k, property.id, data.id, _loadedFurniture[property.id][index])
                                 end
                             end
 
@@ -96,13 +94,14 @@ function CreateFurnitureCallbacks()
         cb(false)
     end)
 
-    exports["pulsar-core"]:RegisterServerCallback("Properties:DeleteFurniture", function(source, data, cb)
-        local char = exports['pulsar-characters']:FetchCharacterSource(source)
+    plsr.Callbacks:RegisterServerCallback("Properties:DeleteFurniture", function(source, data, cb)
+        local char = plsr.Fetch:CharacterSource(source)
         if char then
             local insideProperty = GlobalState[string.format("%s:Property", source)]
             if insideProperty and data.id then
                 local property = _properties[insideProperty]
-                if property and (property.keys ~= nil and property.keys[char:GetData("ID")]) and _loadedFurniture[property.id] and property.keys[char:GetData("ID")] ~= nil and ((property.keys[char:GetData("ID")].Permissions and property.keys[char:GetData("ID")].Permissions.furniture) or property.keys[char:GetData("ID")].Owner) then
+                if property and (property.keys ~= nil and property.keys[char:GetData("ID")]) and _loadedFurniture[property.id] and property.keys[char:GetData("ID")] ~= nil and (property.keys[char:GetData("ID")].Permissions?.furniture or property.keys[char:GetData("ID")].Owner) then
+
                     local nF = {}
                     for k, v in ipairs(_loadedFurniture[property.id]) do
                         if v.id ~= data.id then
@@ -120,8 +119,7 @@ function CreateFurnitureCallbacks()
                     if updated then
                         if _insideProperties[property.id] then
                             for k, v in pairs(_insideProperties[property.id]) do
-                                TriggerClientEvent("Furniture:Client:DeleteItem", k, property.id, data.id,
-                                    _loadedFurniture[property.id])
+                                TriggerClientEvent("Furniture:Client:DeleteItem", k, property.id, data.id, _loadedFurniture[property.id])
                             end
                         end
 
@@ -142,18 +140,24 @@ function GetPropertyFurniture(pId, pInt)
     end
 
     local p = promise.new()
-    exports.oxmysql:execute('SELECT * FROM properties_furniture WHERE property = ?', { pId }, function(results)
-        if results and #results > 0 and results[1] and results[1].furniture then
-            local furniture = json.decode(results[1].furniture)
-            p:resolve(furniture)
-        else
+
+    EnsurePropertiesTable(function()
+        plsr.Database:Single("SELECT `data` FROM `properties_furniture` WHERE `property_id` = ?", { pId }, function(success, row)
+            if success and row ~= nil then
+                local ok, decoded = pcall(json.decode, row.data)
+                if ok and type(decoded) == "table" and decoded.furniture then
+                    p:resolve(decoded.furniture)
+                    return
+                end
+            end
+
             local interior = PropertyInteriors[pInt]
-            if interior and interior.defaultFurniture then
+            if interior?.defaultFurniture then
                 p:resolve(table.copy(interior.defaultFurniture))
             else
                 p:resolve({})
             end
-        end
+        end)
     end)
 
     local res = Citizen.Await(p)
@@ -169,13 +173,21 @@ function SetPropertyFurniture(pId, newFurniture, updater)
     end
     local p = promise.new()
 
-    local furnitureJson = json.encode(newFurniture)
-    local updatedByJson = json.encode(updater)
-
-    exports.oxmysql:execute(
-    'INSERT INTO properties_furniture (property, furniture, updatedTime, updatedBy) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE furniture = VALUES(furniture), updatedTime = VALUES(updatedTime), updatedBy = VALUES(updatedBy)',
-        { pId, furnitureJson, os.time(), updatedByJson }, function(affectedRows)
-        p:resolve(affectedRows > 0)
+    EnsurePropertiesTable(function()
+        plsr.Database:Update(
+            "INSERT INTO `properties_furniture` (`property_id`, `data`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `data` = VALUES(`data`)",
+            {
+                pId,
+                json.encode({
+                    furniture = newFurniture,
+                    updatedTime = os.time(),
+                    updatedBy = updater,
+                }),
+            },
+            function(success)
+                p:resolve(success)
+            end
+        )
     end)
 
     local res = Citizen.Await(p)
@@ -191,8 +203,10 @@ end
 function DeletePropertyFurniture(pId)
     local p = promise.new()
 
-    exports.oxmysql:execute('DELETE FROM properties_furniture WHERE property = ?', { pId }, function(affectedRows)
-        p:resolve(affectedRows > 0)
+    EnsurePropertiesTable(function()
+        plsr.Database:Update("DELETE FROM `properties_furniture` WHERE `property_id` = ?", { pId }, function(success)
+            p:resolve(success)
+        end)
     end)
 
     local res = Citizen.Await(p)

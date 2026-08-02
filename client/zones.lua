@@ -5,201 +5,191 @@ function CreatePropertyZones(propertyId, int)
 
     local interior = PropertyInteriors[int]
     if interior then
-        exports.ox_target:addBoxZone({
-            id = string.format("property-%s-exit", propertyId),
-            coords = interior.locations.front.polyzone.center,
-            size = vector3(interior.locations.front.polyzone.length, interior.locations.front.polyzone.width, 2.0),
-            rotation = interior.locations.front.polyzone.options.heading or 0,
-            debug = false,
-            minZ = interior.locations.front.polyzone.options.minZ,
-            maxZ = interior.locations.front.polyzone.options.maxZ,
-            options = {
+        plsr.Targeting.Zones:AddBox(
+            string.format("property-%s-exit", propertyId),
+            "door-open",
+            interior.locations.front.polyzone.center,
+            interior.locations.front.polyzone.length,
+            interior.locations.front.polyzone.width,
+            interior.locations.front.polyzone.options,
+            {
                 {
-                    icon = "fas fa-door-open",
-                    label = "Exit",
-                    onSelect = function()
-                        TriggerEvent("Properties:Client:Exit", {
-                            property = propertyId,
-                            backdoor = false,
-                        })
-                    end,
+                    icon = "door-open",
+                    text = "Exit",
+                    event = "Properties:Client:Exit",
+                    data = {
+                        property = propertyId,
+                        backdoor = false,
+                    },
                 },
-            }
-        })
+            },
+            2.0,
+            true
+        )
 
         if interior.locations.back then
-            exports.ox_target:addBoxZone({
-                id = string.format("property-%s-exit-back", propertyId),
-                coords = interior.locations.back.polyzone.center,
-                size = vector3(interior.locations.back.polyzone.length, interior.locations.back.polyzone.width, 2.0),
-                rotation = interior.locations.back.polyzone.options.heading or 0,
-                debug = false,
-                minZ = interior.locations.back.polyzone.options.minZ,
-                maxZ = interior.locations.back.polyzone.options.maxZ,
-                options = {
+            plsr.Targeting.Zones:AddBox(
+                string.format("property-%s-exit-back", propertyId),
+                "door-open",
+                interior.locations.back.polyzone.center,
+                interior.locations.back.polyzone.length,
+                interior.locations.back.polyzone.width,
+                interior.locations.back.polyzone.options,
+                {
                     {
-                        icon = "fas fa-door-open",
-                        label = "Exit",
-                        onSelect = function()
-                            TriggerEvent("Properties:Client:Exit", {
-                                property = propertyId,
-                                backdoor = true,
-                            })
-                        end,
+                        icon = "door-open",
+                        text = "Exit",
+                        event = "Properties:Client:Exit",
+                        data = {
+                            property = propertyId,
+                            backdoor = true,
+                        },
                     },
-                }
-            })
+                },
+                2.0,
+                true
+            )
         end
 
         if interior.locations.office then
-            exports.ox_target:addBoxZone({
-                id = string.format("property-%s-office", propertyId),
-                coords = interior.locations.office.polyzone.center,
-                size = vector3(interior.locations.office.polyzone.length, interior.locations.office.polyzone.width, 2.0),
-                rotation = interior.locations.office.polyzone.options.heading or 0,
-                debug = false,
-                minZ = interior.locations.office.polyzone.options.minZ,
-                maxZ = interior.locations.office.polyzone.options.maxZ,
-                options = {
+            plsr.Targeting.Zones:AddBox(
+                string.format("property-%s-office", propertyId),
+                "phone-office",
+                interior.locations.office.polyzone.center,
+                interior.locations.office.polyzone.length,
+                interior.locations.office.polyzone.width,
+                interior.locations.office.polyzone.options,
+                {
                     {
-                        icon = "fas fa-box-open-full",
-                        label = "Access Storage",
-                        onSelect = function()
-                            TriggerEvent("Properties:Client:Stash", propertyId)
-                        end,
-                        canInteract = function(data)
+                        icon = "boxes-packing",
+                        text = "Access Storage",
+                        event = "Properties:Client:Stash",
+                        data = propertyId,
+                        isEnabled = function(data)
                             if not _propertiesLoaded then
                                 return false
                             end
                             local property = _properties[data]
-                            return (property.keys ~= nil and property.keys[LocalPlayer.state.Character:GetData("ID")] ~= nil) or
-                                LocalPlayer.state.onDuty == "police"
+                            return (property.keys ~= nil and property.keys[plsr.State.character.ID] ~= nil) or plsr.State.flags.onDuty == "police"
                         end,
                     },
                     {
-                        icon = "fas fa-clipboard",
-                        label = "Go On/Off Duty",
-                        onSelect = function()
-                            TriggerEvent("Properties:Client:Duty", propertyId)
-                        end,
-                        canInteract = function(data)
+                        icon = "clipboard",
+                        text = "Go On/Off Duty",
+                        event = "Properties:Client:Duty",
+                        data = propertyId,
+                        isEnabled = function(data)
                             if not _propertiesLoaded then
                                 return false
                             end
                             local property = _properties[data]
-                            return property.keys ~= nil and
-                                property.keys[LocalPlayer.state.Character:GetData("ID")] ~= nil and
-                                property?.data?.jobDuty
+                            return property.keys ~= nil and property.keys[plsr.State.character.ID] ~= nil and property?.data?.jobDuty
                         end,
                     },
-                }
-            })
+                },
+                2.0,
+                true
+            )
         end
 
         if interior.locations.warehouse then
-            exports.ox_target:addBoxZone({
-                id = string.format("property-%s-warehouse", propertyId),
-                coords = interior.locations.warehouse.polyzone.center,
-                size = vector3(interior.locations.warehouse.polyzone.length, interior.locations.warehouse.polyzone.width,
-                    2.0),
-                rotation = interior.locations.warehouse.polyzone.options.heading or 0,
-                debug = false,
-                minZ = interior.locations.warehouse.polyzone.options.minZ,
-                maxZ = interior.locations.warehouse.polyzone.options.maxZ,
-                options = {
+            plsr.Targeting.Zones:AddBox(
+                string.format("property-%s-warehouse", propertyId),
+                "warehouse-full",
+                interior.locations.warehouse.polyzone.center,
+                interior.locations.warehouse.polyzone.length,
+                interior.locations.warehouse.polyzone.width,
+                interior.locations.warehouse.polyzone.options,
+                {
                     {
-                        icon = "fas fa-box-open-full",
-                        label = "Access Storage",
-                        onSelect = function()
-                            TriggerEvent("Properties:Client:Stash", propertyId)
-                        end,
-                        canInteract = function(data)
+                        icon = "boxes-packing",
+                        text = "Access Storage",
+                        event = "Properties:Client:Stash",
+                        data = propertyId,
+                        isEnabled = function(data)
                             if not _propertiesLoaded then
                                 return false
                             end
                             local property = _properties[data]
-                            return property.keys ~= nil and
-                                property.keys[LocalPlayer.state.Character:GetData("ID")] ~= nil
+                            return property.keys ~= nil and property.keys[plsr.State.character.ID] ~= nil
                         end,
                     },
-                }
-            })
+                },
+                2.0,
+                true
+            )
         end
 
         if interior.locations.crafting and GlobalState[string.format("Property:Crafting:%s", propertyId)] then
             local menu = {
                 {
-                    icon = "fas fa-box-open-full",
-                    label = "Access Storage",
-                    onSelect = function()
-                        TriggerEvent("Properties:Client:Stash", propertyId)
-                    end,
-                    canInteract = function(data)
+                    icon = "boxes-packing",
+                    text = "Access Storage",
+                    event = "Properties:Client:Stash",
+                    data = propertyId,
+                    isEnabled = function(data)
                         if not _propertiesLoaded then
                             return false
                         end
                         local property = _properties[data]
-                        return (property.keys ~= nil and property.keys[LocalPlayer.state.Character:GetData("ID")] ~= nil) or
-                            LocalPlayer.state.onDuty == "police"
+                        return (property.keys ~= nil and property.keys[plsr.State.character.ID] ~= nil) or plsr.State.flags.onDuty == "police"
                     end,
                 },
                 {
-                    icon = "fas fa-screwdriver-wrench",
-                    label = "Use Bench",
-                    onSelect = function()
-                        TriggerEvent("Properties:Client:Crafting", propertyId)
-                    end,
-                    canInteract = function(data)
+                    icon = "screwdriver-wrench",
+                    text = "Use Bench",
+                    event = "Properties:Client:Crafting",
+                    data = propertyId,
+                    isEnabled = function(data)
                         if not _propertiesLoaded then
                             return false
                         end
                         local property = _properties[data]
-                        return property.keys ~= nil and property.keys[LocalPlayer.state.Character:GetData("ID")] ~= nil
+                        return property.keys ~= nil and property.keys[plsr.State.character.ID] ~= nil
                     end,
                 },
             }
 
             if GlobalState[string.format("Property:Crafting:%s", propertyId)].schematics then
                 table.insert(menu, {
-                    icon = "fas fa-memo-circle-check",
-                    label = "Add Schematic To Bench",
+                    icon = "memo-circle-check",
+                    text = "Add Schematic To Bench",
                     event = "Crafting:Client:AddSchematic",
-                    onSelect = function()
-                        TriggerEvent("Crafting:Client:AddSchematic", {
-                            id = string.format("property-%s", propertyId),
-                        })
-                    end,
-                    canInteract = function()
+                    data = {
+                        id = string.format("property-%s", propertyId),
+                    },
+                    isEnabled = function(data, entityData)
                         if not _propertiesLoaded then
                             return false
                         end
 
-                        return exports.ox_inventory:ItemsHasType(17, 1)
+                        return plsr.Inventory.Items:HasType(17, 1)
                     end,
                 })
             end
 
-            exports.ox_target:addBoxZone({
-                id = string.format("property-%s-crafting", propertyId),
-                coords = interior.locations.crafting.polyzone.center,
-                size = vector3(interior.locations.crafting.polyzone.length, interior.locations.crafting.polyzone.width,
-                    2.0),
-                rotation = interior.locations.crafting.polyzone.options.heading or 0,
-                debug = false,
-                minZ = interior.locations.crafting.polyzone.options.minZ,
-                maxZ = interior.locations.crafting.polyzone.options.maxZ,
-                options = menu
-            })
+            plsr.Targeting.Zones:AddBox(
+                string.format("property-%s-crafting", propertyId),
+                "screwdriver-wrench",
+                interior.locations.crafting.polyzone.center,
+                interior.locations.crafting.polyzone.length,
+                interior.locations.crafting.polyzone.width,
+                interior.locations.crafting.polyzone.options,
+                menu,
+                2.0,
+                true
+            )
         end
 
         Wait(1000)
+        plsr.Targeting.Zones:Refresh()
     end
 end
 
 function DestroyPropertyZones(propertyId)
-    exports.ox_target:removeZone(string.format("property-%s-exit", propertyId))
-    exports.ox_target:removeZone(string.format("property-%s-exit-back", propertyId))
-    exports.ox_target:removeZone(string.format("property-%s-warehouse", propertyId))
-    exports.ox_target:removeZone(string.format("property-%s-office", propertyId))
-    exports.ox_target:removeZone(string.format("property-%s-crafting", propertyId))
+	plsr.Targeting.Zones:RemoveZone(string.format("property-%s-exit", propertyId))
+	plsr.Targeting.Zones:RemoveZone(string.format("property-%s-exit-back", propertyId))
+	plsr.Targeting.Zones:RemoveZone(string.format("property-%s-warehouse", propertyId))
+	plsr.Targeting.Zones:RemoveZone(string.format("property-%s-office", propertyId))
+    plsr.Targeting.Zones:RemoveZone(string.format("property-%s-crafting", propertyId))
 end

@@ -10,7 +10,7 @@ function StartPreview(int)
     end
 
     if not _insideInterior then
-        exports["pulsar-hud"]:Notification("error", "Must be Inside Your Property to Preview Interiors", 8000)
+        plsr.Notification:Error("Must be Inside Your Property to Preview Interiors", 8000)
         return false
     end
 
@@ -21,7 +21,7 @@ function StartPreview(int)
         _previewingInteriorCam = 1
         _previewingInteriorSwitching = true
 
-        exports['pulsar-phone']:Close(true)
+        plsr.Phone:Close(true)
 
         DoScreenFadeOut(250)
         while not IsScreenFadedOut() do
@@ -30,20 +30,17 @@ function StartPreview(int)
 
         Wait(200)
 
-        SetFocusArea(intData.locations.front.coords.x, intData.locations.front.coords.y, intData.locations.front.coords
-            .z, 0.0, 0.0, 0.0)
-        SetupGTACamera(_previewingInterior[_previewingInteriorCam].coords,
-            _previewingInterior[_previewingInteriorCam].rotation)
+        SetFocusArea(intData.locations.front.coords.x, intData.locations.front.coords.y, intData.locations.front.coords.z, 0.0, 0.0, 0.0)
+        SetupGTACamera(_previewingInterior[_previewingInteriorCam].coords, _previewingInterior[_previewingInteriorCam].rotation)
         DoScreenFadeIn(250)
         CameraLoop()
 
-        exports['pulsar-hud']:InfoOverlayShow(_previewingInteriorData?.info?.name or "Unknown",
-            _previewingInterior and _previewingInterior[_previewingInteriorCam].name or "???")
+        plsr.InfoOverlay:Show(_previewingInteriorData?.info?.name or "Unknown", _previewingInterior and _previewingInterior[_previewingInteriorCam].name or "???")
 
         _previewingInteriorSwitching = false
         return true
     else
-        exports["pulsar-hud"]:Notification("error", "Cannot Preview Interior")
+        plsr.Notification:Error("Cannot Preview Interior")
     end
     return false
 end
@@ -61,7 +58,7 @@ function EndPreview()
     CleanupGTACamera()
     DoScreenFadeIn(250)
 
-    exports['pulsar-hud']:InfoOverlayClose()
+    plsr.InfoOverlay:Close()
     _previewingInterior = nil
     _previewingInteriorSwitching = false
 end
@@ -71,7 +68,7 @@ function PrevPreview()
         _previewingInteriorSwitching = true
         _previewingInteriorCam -= 1
 
-        exports['pulsar-hud']:InfoOverlayClose()
+        plsr.InfoOverlay:Close()
 
         DoScreenFadeOut(250)
         while not IsScreenFadedOut() do
@@ -80,14 +77,12 @@ function PrevPreview()
 
         Wait(200)
 
-        SetupGTACamera(_previewingInterior[_previewingInteriorCam].coords,
-            _previewingInterior[_previewingInteriorCam].rotation)
+        SetupGTACamera(_previewingInterior[_previewingInteriorCam].coords, _previewingInterior[_previewingInteriorCam].rotation)
 
         DoScreenFadeIn(250)
         CameraLoop()
 
-        exports['pulsar-hud']:InfoOverlayShow(_previewingInteriorData?.info?.name or "Unknown",
-            _previewingInterior[_previewingInteriorCam].name)
+        plsr.InfoOverlay:Show(_previewingInteriorData?.info?.name or "Unknown", _previewingInterior[_previewingInteriorCam].name)
 
         _previewingInteriorSwitching = false
     end
@@ -98,7 +93,7 @@ function NextPreview()
         _previewingInteriorSwitching = true
         _previewingInteriorCam += 1
 
-        exports['pulsar-hud']:InfoOverlayClose()
+        plsr.InfoOverlay:Close()
 
         DoScreenFadeOut(250)
         while not IsScreenFadedOut() do
@@ -107,48 +102,46 @@ function NextPreview()
 
         Wait(200)
 
-        SetupGTACamera(_previewingInterior[_previewingInteriorCam].coords,
-            _previewingInterior[_previewingInteriorCam].rotation)
+        SetupGTACamera(_previewingInterior[_previewingInteriorCam].coords, _previewingInterior[_previewingInteriorCam].rotation)
 
         DoScreenFadeIn(250)
         CameraLoop()
 
-        exports['pulsar-hud']:InfoOverlayShow(_previewingInteriorData?.info?.name or "Unknown",
-            _previewingInterior[_previewingInteriorCam].name)
+        plsr.InfoOverlay:Show(_previewingInteriorData?.info?.name or "Unknown", _previewingInterior[_previewingInteriorCam].name)
 
         _previewingInteriorSwitching = false
     end
 end
 
 function SetupGTACamera(c, r)
-    if createdCamera ~= 0 then
-        DestroyCam(createdCamera, 0)
-        createdCamera = 0
-    end
-    local cam = CreateCam("DEFAULT_SCRIPTED_CAMERA", 1)
-    SetCamCoord(cam, c.x, c.y, c.z)
-    SetCamRot(cam, r.x, r.y, r.z, 2)
-    RenderScriptCams(1, 0, 0, 1, 1)
-    Wait(250)
-    createdCamera = cam
+	if createdCamera ~= 0 then
+		DestroyCam(createdCamera, 0)
+		createdCamera = 0
+	end
+	local cam = CreateCam("DEFAULT_SCRIPTED_CAMERA", 1)
+	SetCamCoord(cam, c.x, c.y, c.z)
+	SetCamRot(cam, r.x, r.y, r.z, 2)
+	RenderScriptCams(1, 0, 0, 1, 1)
+	Wait(250)
+	createdCamera = cam
 end
 
 function CleanupGTACamera()
-    DestroyCam(createdCamera, 0)
-    RenderScriptCams(0, 0, 1, 1, 1)
-    createdCamera = 0
-    ClearTimecycleModifier(currentTimecycle)
-    SetFocusEntity(LocalPlayer.state.ped)
+	DestroyCam(createdCamera, 0)
+	RenderScriptCams(0, 0, 1, 1, 1)
+	createdCamera = 0
+	ClearTimecycleModifier(currentTimecycle)
+	SetFocusEntity(PlayerPedId())
 end
 
 function InstructionScaleform(scaleform, isGroup, isOnline, canRot)
-    if createdCamera ~= 0 then
-        local scaleform = RequestScaleformMovie(scaleform)
-        while not HasScaleformMovieLoaded(scaleform) do
-            Wait(0)
-        end
-        PushScaleformMovieFunction(scaleform, "CLEAR_ALL")
-        PopScaleformMovieFunctionVoid()
+	if createdCamera ~= 0 then
+		local scaleform = RequestScaleformMovie(scaleform)
+		while not HasScaleformMovieLoaded(scaleform) do
+			Wait(0)
+		end
+		PushScaleformMovieFunction(scaleform, "CLEAR_ALL")
+		PopScaleformMovieFunctionVoid()
 
         PushScaleformMovieFunction(scaleform, "SET_DATA_SLOT")
         PushScaleformMovieFunctionParameterInt(3)
@@ -168,62 +161,62 @@ function InstructionScaleform(scaleform, isGroup, isOnline, canRot)
         InstructionButtonMessage("Leave")
         PopScaleformMovieFunctionVoid()
 
-        PushScaleformMovieFunction(scaleform, "DRAW_INSTRUCTIONAL_BUTTONS")
-        PopScaleformMovieFunctionVoid()
+		PushScaleformMovieFunction(scaleform, "DRAW_INSTRUCTIONAL_BUTTONS")
+		PopScaleformMovieFunctionVoid()
 
-        PushScaleformMovieFunction(scaleform, "SET_BACKGROUND_COLOUR")
-        PushScaleformMovieFunctionParameterInt(0)
-        PushScaleformMovieFunctionParameterInt(0)
-        PushScaleformMovieFunctionParameterInt(0)
-        PushScaleformMovieFunctionParameterInt(80)
-        PopScaleformMovieFunctionVoid()
+		PushScaleformMovieFunction(scaleform, "SET_BACKGROUND_COLOUR")
+		PushScaleformMovieFunctionParameterInt(0)
+		PushScaleformMovieFunctionParameterInt(0)
+		PushScaleformMovieFunctionParameterInt(0)
+		PushScaleformMovieFunctionParameterInt(80)
+		PopScaleformMovieFunctionVoid()
 
-        return scaleform
-    else
-        return false
-    end
+		return scaleform
+	else
+		return false
+	end
 end
 
 function InstructionButton(ControlButton)
-    N_0xe83a3e3557a56640(ControlButton)
+	N_0xe83a3e3557a56640(ControlButton)
 end
 
 function InstructionButtonMessage(text)
-    BeginTextCommandScaleformString("STRING")
-    AddTextComponentScaleform(text)
-    EndTextCommandScaleformString()
+	BeginTextCommandScaleformString("STRING")
+	AddTextComponentScaleform(text)
+	EndTextCommandScaleformString()
 end
 
 function CameraLoop()
     CreateThread(function()
         while createdCamera ~= 0 do
-            DisableControlAction(0, 1, true)      -- LookLeftRight
-            DisableControlAction(0, 2, true)      -- LookUpDown
-            DisableControlAction(0, 106, true)    -- VehicleMouseControlOverride
-            DisableControlAction(0, 22, true)     -- INPUT_JUMP
-            DisableControlAction(0, 30, true)     -- disable left/right
-            DisableControlAction(0, 31, true)     -- disable forward/back
-            DisableControlAction(0, 36, true)     -- INPUT_DUCK
-            DisableControlAction(0, 21, true)     -- disable sprint
-            DisableControlAction(0, 44, true)     -- disable cover
-            DisableControlAction(0, 63, true)     -- veh turn left
-            DisableControlAction(0, 64, true)     -- veh turn right
-            DisableControlAction(0, 71, true)     -- veh forward
-            DisableControlAction(0, 72, true)     -- veh backwards
-            DisableControlAction(0, 75, true)     -- disable exit vehicle
+            DisableControlAction(0, 1, true) -- LookLeftRight
+            DisableControlAction(0, 2, true) -- LookUpDown
+            DisableControlAction(0, 106, true) -- VehicleMouseControlOverride
+            DisableControlAction(0, 22, true) -- INPUT_JUMP
+            DisableControlAction(0, 30, true) -- disable left/right
+            DisableControlAction(0, 31, true) -- disable forward/back
+            DisableControlAction(0, 36, true) -- INPUT_DUCK
+            DisableControlAction(0, 21, true) -- disable sprint
+            DisableControlAction(0, 44, true) -- disable cover
+            DisableControlAction(0, 63, true) -- veh turn left
+            DisableControlAction(0, 64, true) -- veh turn right
+            DisableControlAction(0, 71, true) -- veh forward
+            DisableControlAction(0, 72, true) -- veh backwards
+            DisableControlAction(0, 75, true) -- disable exit vehicle
             DisablePlayerFiring(PlayerId(), true) -- Disable weapon firing
-            DisableControlAction(0, 24, true)     -- disable attack
-            DisableControlAction(0, 25, true)     -- disable aim
-            DisableControlAction(1, 37, true)     -- disable weapon select
-            DisableControlAction(0, 47, true)     -- disable weapon
-            DisableControlAction(0, 58, true)     -- disable weapon
-            DisableControlAction(0, 140, true)    -- disable melee
-            DisableControlAction(0, 141, true)    -- disable melee
-            DisableControlAction(0, 142, true)    -- disable melee
-            DisableControlAction(0, 143, true)    -- disable melee
-            DisableControlAction(0, 263, true)    -- disable melee
-            DisableControlAction(0, 264, true)    -- disable melee
-            DisableControlAction(0, 257, true)    -- disable melee
+            DisableControlAction(0, 24, true) -- disable attack
+            DisableControlAction(0, 25, true) -- disable aim
+            DisableControlAction(1, 37, true) -- disable weapon select
+            DisableControlAction(0, 47, true) -- disable weapon
+            DisableControlAction(0, 58, true) -- disable weapon
+            DisableControlAction(0, 140, true) -- disable melee
+            DisableControlAction(0, 141, true) -- disable melee
+            DisableControlAction(0, 142, true) -- disable melee
+            DisableControlAction(0, 143, true) -- disable melee
+            DisableControlAction(0, 263, true) -- disable melee
+            DisableControlAction(0, 264, true) -- disable melee
+            DisableControlAction(0, 257, true) -- disable melee
             Wait(1)
         end
     end)
@@ -238,13 +231,13 @@ function CameraLoop()
 end
 
 AddEventHandler("Keybinds:Client:KeyDown:cancel_action", function()
-    if _previewingInterior then
+	if _previewingInterior then
         EndPreview()
-    end
+	end
 end)
 
 AddEventHandler("Ped:Client:Died", function()
-    if _previewingInterior then
+	if _previewingInterior then
         EndPreview()
-    end
+	end
 end)

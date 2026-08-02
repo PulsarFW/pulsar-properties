@@ -1,5 +1,5 @@
 function RegisterChatCommands()
-	exports["pulsar-chat"]:RegisterAdminCommand("addprop", function(source, args, rawCommand)
+	plsr.Chat:RegisterAdminCommand("addprop", function(source, args, rawCommand)
 		local ped = GetPlayerPed(source)
 		local coords = GetEntityCoords(ped)
 		local pos = {
@@ -9,7 +9,8 @@ function RegisterChatCommands()
 			h = GetEntityHeading(ped),
 		}
 
-		exports['pulsar-properties']:Add(source, args[1], args[2], tonumber(args[3]), args[4], pos)
+		plsr.Properties.Manage:Add(source, args[1], args[2], tonumber(args[3]), args[4], pos)
+		TriggerEvent("Properties:RefreshProperties")
 	end, {
 		help = "Add New Property To Database (Enter Is Where You're At)",
 		params = {
@@ -32,9 +33,9 @@ function RegisterChatCommands()
 		},
 	}, 4)
 
-	exports["pulsar-chat"]:RegisterAdminCommand("delprop", function(source, args, rawCommand)
-		if exports['pulsar-properties']:Delete(args[1]) then
-			exports["pulsar-chat"]:SendServerSingle(source, "Property Has Been Deleted")
+	plsr.Chat:RegisterAdminCommand("delprop", function(source, args, rawCommand)
+		if plsr.Properties.Manage:Delete(args[1]) then
+			plsr.Chat.Send.Server:Single(source, "Property Has Been Deleted")
 		end
 	end, {
 		help = "Delete Property",
@@ -46,7 +47,7 @@ function RegisterChatCommands()
 		},
 	}, 1)
 
-	exports["pulsar-chat"]:RegisterAdminCommand("addfd", function(source, args, rawCommand)
+	plsr.Chat:RegisterAdminCommand("addfd", function(source, args, rawCommand)
 		local ped = GetPlayerPed(source)
 		local coords = GetEntityCoords(ped)
 		local pos = {
@@ -56,10 +57,10 @@ function RegisterChatCommands()
 			h = GetEntityHeading(ped) + 0.0,
 		}
 
-		if exports['pulsar-properties']:AddFrontdoor(args[1], pos) then
-			exports["pulsar-chat"]:SendServerSingle(source, "Frontdoor Added to Property: " .. args[1])
+		if plsr.Properties.Manage:AddFrontdoor(args[1], pos) then
+			plsr.Chat.Send.Server:Single(source, "Frontdoor Added to Property: " .. args[1])
 		else
-			exports["pulsar-chat"]:SendServerSingle(source, "No Existing Property")
+			plsr.Chat.Send.Server:Single(source, "No Existing Property")
 		end
 	end, {
 		help = "Set The Front Door Location Of A Property",
@@ -69,7 +70,7 @@ function RegisterChatCommands()
 		} },
 	}, 1)
 
-	exports["pulsar-chat"]:RegisterAdminCommand("addbd", function(source, args, rawCommand)
+	plsr.Chat:RegisterAdminCommand("addbd", function(source, args, rawCommand)
 		local ped = GetPlayerPed(source)
 		local coords = GetEntityCoords(ped)
 		local pos = {
@@ -79,10 +80,10 @@ function RegisterChatCommands()
 			h = GetEntityHeading(ped) + 0.0,
 		}
 
-		if exports['pulsar-properties']:AddBackdoor(args[1], pos) then
-			exports["pulsar-chat"]:SendServerSingle(source, "Backdoor Added to Property: " .. args[1])
+		if plsr.Properties.Manage:AddBackdoor(args[1], pos) then
+			plsr.Chat.Send.Server:Single(source, "Backdoor Added to Property: " .. args[1])
 		else
-			exports["pulsar-chat"]:SendServerSingle(source, "No Existing Property")
+			plsr.Chat.Send.Server:Single(source, "No Existing Property")
 		end
 	end, {
 		help = "Set The Backdoor Location Of A Property",
@@ -92,7 +93,7 @@ function RegisterChatCommands()
 		} },
 	}, 1)
 
-	exports["pulsar-chat"]:RegisterAdminCommand("addgarage", function(source, args, rawCommand)
+	plsr.Chat:RegisterAdminCommand("addgarage", function(source, args, rawCommand)
 		local ped = GetPlayerPed(source)
 		local coords = GetEntityCoords(ped)
 		local pos = {
@@ -102,10 +103,10 @@ function RegisterChatCommands()
 			h = GetEntityHeading(ped) + 0.0,
 		}
 
-		if exports['pulsar-properties']:AddGarage(args[1], pos) then
-			exports["pulsar-chat"]:SendServerSingle(source, "Garage Added to Property: " .. args[1])
+		if plsr.Properties.Manage:AddGarage(args[1], pos) then
+			plsr.Chat.Send.Server:Single(source, "Garage Added to Property: " .. args[1])
 		else
-			exports["pulsar-chat"]:SendServerSingle(source, "No Existing Property")
+			plsr.Chat.Send.Server:Single(source, "No Existing Property")
 		end
 	end, {
 		help = "Set The Garage Location Of A Property",
@@ -115,11 +116,11 @@ function RegisterChatCommands()
 		} },
 	}, 1)
 
-	exports["pulsar-chat"]:RegisterAdminCommand("removegarage", function(source, args, rawCommand)
-		if exports['pulsar-properties']:AddGarage(args[1], false) then
-			exports["pulsar-chat"]:SendServerSingle(source, "Garage Removed From Property: " .. args[1])
+	plsr.Chat:RegisterAdminCommand("removegarage", function(source, args, rawCommand)
+		if plsr.Properties.Manage:AddGarage(args[1], false) then
+			plsr.Chat.Send.Server:Single(source, "Garage Removed From Property: " .. args[1])
 		else
-			exports["pulsar-chat"]:SendServerSingle(source, "No Existing Property")
+			plsr.Chat.Send.Server:Single(source, "No Existing Property")
 		end
 	end, {
 		help = "Remove The Garage Location Of A Property",
@@ -129,14 +130,14 @@ function RegisterChatCommands()
 		} },
 	}, 1)
 
-	exports["pulsar-chat"]:RegisterAdminCommand("setint", function(source, args, rawCommand)
-		if exports['pulsar-properties']:UpgradeSetInterior(args[1], args[2]) then
-			exports["pulsar-chat"]:SendServerSingle(source, "Interior Set For Property: " .. args[1])
+	plsr.Chat:RegisterAdminCommand("setint", function(source, args, rawCommand)
+		if plsr.Properties.Upgrades:SetInterior(args[1], args[2]) then
+			plsr.Chat.Send.Server:Single(source, "Interior Set For Property: " .. args[1])
 
 			DeletePropertyFurniture(args[1])
-			exports['pulsar-properties']:ForceEveryoneLeave(args[1])
+			plsr.Properties:ForceEveryoneLeave(args[1])
 		else
-			exports["pulsar-chat"]:SendServerSingle(source, "No Existing Property")
+			plsr.Chat.Send.Server:Single(source, "No Existing Property")
 		end
 	end, {
 		help = "Set The Interior Of A Property",
@@ -152,13 +153,13 @@ function RegisterChatCommands()
 		},
 	}, 2)
 
-	exports["pulsar-chat"]:RegisterAdminCommand("setupgrade", function(source, args, rawCommand)
+	plsr.Chat:RegisterAdminCommand("setupgrade", function(source, args, rawCommand)
 		local level = tonumber(args[3])
 		if level and level > 0 then
-			if exports['pulsar-properties']:UpgradeSet(args[1], args[2], level) then
-				exports["pulsar-chat"]:SendServerSingle(source, "Upgrade Set For Property: " .. args[1])
+			if plsr.Properties.Upgrades:Set(args[1], args[2], level) then
+				plsr.Chat.Send.Server:Single(source, "Upgrade Set For Property: " .. args[1])
 			else
-				exports["pulsar-chat"]:SendServerSingle(source, "No Existing Property")
+				plsr.Chat.Send.Server:Single(source, "No Existing Property")
 			end
 		end
 	end, {
@@ -179,11 +180,11 @@ function RegisterChatCommands()
 		},
 	}, 3)
 
-	exports["pulsar-chat"]:RegisterAdminCommand("setlabel", function(source, args, rawCommand)
-		if exports['pulsar-properties']:SetLabel(args[1], args[2]) then
-			exports["pulsar-chat"]:SendServerSingle(source, "Label Set For Property: " .. args[1])
+	plsr.Chat:RegisterAdminCommand("setlabel", function(source, args, rawCommand)
+		if plsr.Properties.Manage:SetLabel(args[1], args[2]) then
+			plsr.Chat.Send.Server:Single(source, "Label Set For Property: " .. args[1])
 		else
-			exports["pulsar-chat"]:SendServerSingle(source, "No Existing Property")
+			plsr.Chat.Send.Server:Single(source, "No Existing Property")
 		end
 	end, {
 		help = "Set The Label Of A Property",
@@ -199,13 +200,13 @@ function RegisterChatCommands()
 		},
 	}, 2)
 
-	exports["pulsar-chat"]:RegisterAdminCommand("setprice", function(source, args, rawCommand)
+	plsr.Chat:RegisterAdminCommand("setprice", function(source, args, rawCommand)
 		local price = tonumber(args[2])
 		if price and price > 0 then
-			if exports['pulsar-properties']:SetPrice(args[1], price) then
-				exports["pulsar-chat"]:SendServerSingle(source, "Price Set For Property: " .. args[1])
+			if plsr.Properties.Manage:SetPrice(args[1], price) then
+				plsr.Chat.Send.Server:Single(source, "Price Set For Property: " .. args[1])
 			else
-				exports["pulsar-chat"]:SendServerSingle(source, "No Existing Property")
+				plsr.Chat.Send.Server:Single(source, "No Existing Property")
 			end
 		end
 	end, {
@@ -222,11 +223,11 @@ function RegisterChatCommands()
 		},
 	}, 2)
 
-	exports["pulsar-chat"]:RegisterAdminCommand("setpropdata", function(source, args, rawCommand)
-		if exports['pulsar-properties']:SetData(args[1], args[2], ParseCommandData(args[3])) then
-			exports["pulsar-chat"]:SendServerSingle(source, "Data Set For Property: " .. args[1])
+	plsr.Chat:RegisterAdminCommand("setpropdata", function(source, args, rawCommand)
+		if plsr.Properties.Manage:SetData(args[1], args[2], ParseCommandData(args[3])) then
+			plsr.Chat.Send.Server:Single(source, "Data Set For Property: " .. args[1])
 		else
-			exports["pulsar-chat"]:SendServerSingle(source, "No Existing Property")
+			plsr.Chat.Send.Server:Single(source, "No Existing Property")
 		end
 	end, {
 		help = "Set Data on a Property",
@@ -246,14 +247,14 @@ function RegisterChatCommands()
 		},
 	}, 3)
 
-	exports["pulsar-chat"]:RegisterAdminCommand("ownproperty", function(source, args, rawCommand)
-		local player = exports['pulsar-core']:FetchSource(source)
+	plsr.Chat:RegisterAdminCommand("ownproperty", function(source, args, rawCommand)
+		local player = plsr.Fetch:Source(source)
 		if player.Permissions:GetLevel() >= 100 then
-			local char = exports['pulsar-characters']:FetchBySID(tonumber(args[1]))
+			local char = plsr.Fetch:SID(tonumber(args[1]))
 			if char then
 				if _properties[args[2]] then
 					if
-						exports['pulsar-properties']:Buy(args[2], {
+						plsr.Properties.Commerce:Buy(args[2], {
 							Char = char:GetData("ID"),
 							SID = char:GetData("SID"),
 							First = char:GetData("First"),
@@ -261,12 +262,12 @@ function RegisterChatCommands()
 							Owner = true,
 						})
 					then
-						exports["pulsar-chat"]:SendSystemSingle(source, "Added Owned Property")
+						plsr.Chat.Send.System:Single(source, "Added Owned Property")
 					else
-						exports["pulsar-chat"]:SendSystemSingle(source, "Failed Adding Owned Property")
+						plsr.Chat.Send.System:Single(source, "Failed Adding Owned Property")
 					end
 				else
-					exports["pulsar-chat"]:SendSystemSingle(source, "No Property With That ID")
+					plsr.Chat.Send.System:Single(source, "No Property With That ID")
 				end
 			end
 		end
@@ -284,17 +285,17 @@ function RegisterChatCommands()
 		},
 	}, 2)
 
-	exports["pulsar-chat"]:RegisterAdminCommand("unownproperty", function(source, args, rawCommand)
-		local player = exports['pulsar-core']:FetchSource(source)
+	plsr.Chat:RegisterAdminCommand("unownproperty", function(source, args, rawCommand)
+		local player = plsr.Fetch:Source(source)
 		if player.Permissions:GetLevel() >= 100 then
 			if _properties[args[1]] then
-				if exports['pulsar-properties']:Sell(args[1]) then
-					exports["pulsar-chat"]:SendSystemSingle(source, "Removed property owner")
+				if plsr.Properties.Commerce:Sell(args[1]) then
+					plsr.Chat.Send.System:Single(source, "Removed property owner")
 				else
-					exports["pulsar-chat"]:SendSystemSingle(source, "Failed to remove property owner")
+					plsr.Chat.Send.System:Single(source, "Failed to remove property owner")
 				end
 			else
-				exports["pulsar-chat"]:SendSystemSingle(source, "No Property With That ID")
+				plsr.Chat.Send.System:Single(source, "No Property With That ID")
 			end
 		end
 	end, {
@@ -307,25 +308,25 @@ function RegisterChatCommands()
 		},
 	}, 1)
 
-	exports["pulsar-chat"]:RegisterAdminCommand("forecloseproperty", function(source, args, rawCommand)
-		local player = exports['pulsar-core']:FetchSource(source)
+	plsr.Chat:RegisterAdminCommand("forecloseproperty", function(source, args, rawCommand)
+		local player = plsr.Fetch:Source(source)
 		if player.Permissions:GetLevel() >= 100 then
 			if _properties[args[1]] then
 				if args[2] == "1" then
-					if exports['pulsar-properties']:Foreclose(args[1], true) then
-						exports["pulsar-chat"]:SendSystemSingle(source, "Property Foreclosed")
+					if plsr.Properties.Commerce:Foreclose(args[1], true) then
+						plsr.Chat.Send.System:Single(source, "Property Foreclosed")
 					else
-						exports["pulsar-chat"]:SendSystemSingle(source, "Failed to foreclose property")
+						plsr.Chat.Send.System:Single(source, "Failed to foreclose property")
 					end
 				else
-					if exports['pulsar-properties']:Foreclose(args[1], false) then
-						exports["pulsar-chat"]:SendSystemSingle(source, "Property Unforeclosed")
+					if plsr.Properties.Commerce:Foreclose(args[1], false) then
+						plsr.Chat.Send.System:Single(source, "Property Unforeclosed")
 					else
-						exports["pulsar-chat"]:SendSystemSingle(source, "Failed to Unforeclosed property")
+						plsr.Chat.Send.System:Single(source, "Failed to Unforeclosed property")
 					end
 				end
 			else
-				exports["pulsar-chat"]:SendSystemSingle(source, "No Property With That ID")
+				plsr.Chat.Send.System:Single(source, "No Property With That ID")
 			end
 		end
 	end, {
@@ -342,18 +343,18 @@ function RegisterChatCommands()
 		},
 	}, 2)
 
-	exports["pulsar-chat"]:RegisterAdminCommand("refreshfurniture", function(source, args, rawCommand)
+	plsr.Chat:RegisterAdminCommand("refreshfurniture", function(source, args, rawCommand)
 		local pId = args[1]
 		if _properties[pId] then
 			if _loadedFurniture[pId] then
 				_loadedFurniture[pId] = nil
 
-				exports["pulsar-chat"]:SendSystemSingle(source, "Furniture Refreshed")
+				plsr.Chat.Send.System:Single(source, "Furniture Refreshed")
 			else
-				exports["pulsar-chat"]:SendSystemSingle(source, "Furniture Wasn't Loaded Anyway")
+				plsr.Chat.Send.System:Single(source, "Furniture Wasn't Loaded Anyway")
 			end
 		else
-			exports["pulsar-chat"]:SendSystemSingle(source, "No Property With That ID")
+			plsr.Chat.Send.System:Single(source, "No Property With That ID")
 		end
 	end, {
 		help = "Force the Furniture to be Loaded from DB Again",
@@ -365,16 +366,16 @@ function RegisterChatCommands()
 		},
 	}, 1)
 
-	exports["pulsar-chat"]:RegisterAdminCommand("resetfurniture", function(source, args, rawCommand)
+	plsr.Chat:RegisterAdminCommand("resetfurniture", function(source, args, rawCommand)
 		local pId = args[1]
 		if _properties[pId] then
 			if DeletePropertyFurniture(pId) then
-				exports["pulsar-chat"]:SendSystemSingle(source, "Furniture Reset")
+				plsr.Chat.Send.System:Single(source, "Furniture Reset")
 			else
-				exports["pulsar-chat"]:SendSystemSingle(source, "Failed to Reset Furniture")
+				plsr.Chat.Send.System:Single(source, "Failed to Reset Furniture")
 			end
 		else
-			exports["pulsar-chat"]:SendSystemSingle(source, "No Property With That ID")
+			plsr.Chat.Send.System:Single(source, "No Property With That ID")
 		end
 	end, {
 		help = "Reset the Property Furniture to Default",
@@ -386,7 +387,7 @@ function RegisterChatCommands()
 		},
 	}, 1)
 	local _showAllProps = false
-	exports["pulsar-chat"]:RegisterAdminCommand("showallprops", function(source, args, rawCommand)
+	plsr.Chat:RegisterAdminCommand("showallprops", function(source, args, rawCommand)
 		TriggerClientEvent("Properties:Client:ShowAllPropertyBlips", source)
 	end, {
 		help = "Show all property blips",

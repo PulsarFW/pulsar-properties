@@ -409,8 +409,8 @@ function _drawWall(p1, p2, minZ, maxZ, r, g, b, a)
     local bottomRight = vector3(p2.x, p2.y, minZ)
     local topRight = vector3(p2.x, p2.y, maxZ)
 
-    DrawPoly(bottomLeft, topLeft, bottomRight, r, g, b, a)
-    DrawPoly(topLeft, topRight, bottomRight, r, g, b, a)
-    DrawPoly(bottomRight, topRight, topLeft, r, g, b, a)
-    DrawPoly(bottomRight, topLeft, bottomLeft, r, g, b, a)
+    DrawPoly(bottomLeft,topLeft,bottomRight,r,g,b,a)
+    DrawPoly(topLeft,topRight,bottomRight,r,g,b,a)
+    DrawPoly(bottomRight,topRight,topLeft,r,g,b,a)
+    DrawPoly(bottomRight,topLeft,bottomLeft,r,g,b,a)
 end

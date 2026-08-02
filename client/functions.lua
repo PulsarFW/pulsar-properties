@@ -1,9 +1,9 @@
 local _moving = false
 
 function EnterProperty(data, backdoor)
-	exports["pulsar-core"]:ServerCallback("Properties:EnterProperty", data.propertyId, function(state, pId, int)
+	plsr.Callbacks:ServerCallback("Properties:EnterProperty", data.propertyId, function(state, pId, int)
 		if state then
-			exports['pulsar-hud']:InteractionHide()
+			plsr.Interaction:Hide()
 
 			DoScreenFadeOut(1000)
 			while not IsScreenFadedOut() do
@@ -16,21 +16,20 @@ function EnterProperty(data, backdoor)
 
 			local property = _properties[pId]
 
-			exports["pulsar-sounds"]:PlayOne("door_open.ogg", 0.3)
+			plsr.Sounds.Play:One("door_open.ogg", 0.3)
 			Wait(200)
 			FreezeEntityPosition(PlayerPedId(), true)
 			Wait(50)
 
 			local interior = PropertyInteriors[int]
 
+
 			if backdoor and interior.locations.back then
-				SetEntityCoords(PlayerPedId(), interior.locations.back.coords.x, interior.locations.back.coords.y,
-					interior.locations.back.coords.z, 0, 0, 0, false)
+				SetEntityCoords(PlayerPedId(), interior.locations.back.coords.x, interior.locations.back.coords.y, interior.locations.back.coords.z, 0, 0, 0, false)
 				Wait(100)
 				SetEntityHeading(PlayerPedId(), interior.locations.back.heading)
 			else
-				SetEntityCoords(PlayerPedId(), interior.locations.front.coords.x, interior.locations.front.coords.y,
-					interior.locations.front.coords.z, 0, 0, 0, false)
+				SetEntityCoords(PlayerPedId(), interior.locations.front.coords.x, interior.locations.front.coords.y, interior.locations.front.coords.z, 0, 0, 0, false)
 				Wait(100)
 				SetEntityHeading(PlayerPedId(), interior.locations.front.heading)
 			end
@@ -51,7 +50,7 @@ function EnterProperty(data, backdoor)
 end
 
 function ExitProperty(data, backdoor)
-	exports["pulsar-core"]:ServerCallback("Properties:ExitProperty", {}, function(pId)
+	plsr.Callbacks:ServerCallback("Properties:ExitProperty", {}, function(pId)
 		_insideProperty = false
 		_insideInterior = false
 
@@ -71,28 +70,29 @@ function ExitProperty(data, backdoor)
 		DestroyFurniture(true)
 		SetFurnitureEditMode(false)
 		if _placingFurniture then
-			exports['pulsar-objects']:PlacerCancel(true, true)
-			exports['pulsar-phone']:ResetRoute()
+			plsr.ObjectPlacer:Cancel(true, true)
+			plsr.Phone:ResetRoute()
 			_placingFurniture = false
-			LocalPlayer.state.placingFurniture = false
-			LocalPlayer.state.furnitureEdit = false
+			plsr.State.flags.placingFurniture = false
+			plsr.State.flags.furnitureEdit = false
 		end
 
 		TriggerEvent('Interiors:Exit')
-		exports["pulsar-sync"]:Start()
+		plsr.Sync:Start()
 
-		exports["pulsar-sounds"]:PlayOne("door_close.ogg", 0.3)
+		plsr.Sounds.Play:One("door_close.ogg", 0.3)
 		Wait(200)
 
 		FreezeEntityPosition(PlayerPedId(), true)
 		Wait(50)
 
-		-- exports.ox_target:removeZone(string.format("property-%s-logout", pId))
-		-- exports.ox_target:removeZone(string.format("property-%s-closet", pId))
-		-- exports.ox_target:removeZone(string.format("property-%s-stash", pId))
-		exports.ox_target:removeZone(string.format("property-%s-exit", pId))
-		exports.ox_target:removeZone(string.format("property-%s-exit-back", pId))
-		--exports['pulsar-polyzone']:Remove("property-int-zone")
+		-- Targeting.Zones:RemoveZone(string.format("property-%s-logout", pId))
+		-- Targeting.Zones:RemoveZone(string.format("property-%s-closet", pId))
+		-- Targeting.Zones:RemoveZone(string.format("property-%s-stash", pId))
+		plsr.Targeting.Zones:RemoveZone(string.format("property-%s-exit", pId))
+		plsr.Targeting.Zones:RemoveZone(string.format("property-%s-exit-back", pId))
+		--Polyzone:Remove("property-int-zone")
+
 
 		if backdoor and property.location.backdoor then
 			SetEntityCoords(
@@ -133,10 +133,10 @@ function ExitProperty(data, backdoor)
 		end
 	end)
 
-	exports["pulsar-hud"]:Notification("remove", nil, nil, nil, nil, "furniture")
+	plsr.Notification.Persistent:Remove("furniture")
 
 	if _previewingInterior then
-		EndPreview()
+        EndPreview()
 	end
 end
 

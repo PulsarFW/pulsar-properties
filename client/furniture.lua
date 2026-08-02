@@ -38,83 +38,75 @@ function PlaceFurniture(v)
 
         if furnData then
             if _specCategories[furnData.cat] then
-                local icon = "draw-square"
+                local icon = "square"
                 local menu = {
                     {
                         icon = "arrows-up-down-left-right",
-                        label = "Move",
-                        onSelect = function()
-                            TriggerEvent("Furniture:Client:OnMove", {
-                                id = v.id,
-                            })
-                        end,
-                        canInteract = function()
-                            return LocalPlayer.state.furnitureEdit
+                        text = "Move",
+                        event = "Furniture:Client:OnMove",
+                        data = {
+                            id = v.id,
+                        },
+                        isEnabled = function()
+                            return plsr.State.flags.furnitureEdit
                         end
                     },
                     {
                         icon = "trash",
-                        label = "Delete",
-                        onSelect = function()
-                            TriggerEvent("Furniture:Client:OnDelete", {
-                                id = v.id,
-                            })
-                        end,
-                        canInteract = function()
-                            return LocalPlayer.state.furnitureEdit
+                        text = "Delete",
+                        event = "Furniture:Client:OnDelete",
+                        data = {
+                            id = v.id,
+                        },
+                        isEnabled = function()
+                            return plsr.State.flags.furnitureEdit
                         end
                     },
                     {
                         icon = "clone",
-                        label = "Clone",
-                        onSelect = function()
-                            TriggerEvent("Furniture:Client:OnClone", {
-                                id = v.id,
-                                model = v.model,
-                            })
-                        end,
-                        canInteract = function()
-                            return LocalPlayer.state.furnitureEdit
+                        text = "Clone",
+                        event = "Furniture:Client:OnClone",
+                        data = {
+                            id = v.id,
+                            model = v.model,
+                        },
+                        isEnabled = function()
+                            return plsr.State.flags.furnitureEdit
                         end
                     },
                 }
 
                 if furnData.cat == "storage" then
-                    icon = "box-open-full"
+                    icon = "boxes-packing"
 
                     table.insert(menu, {
-                        icon = "box-open-full",
-                        label = "Access Storage",
+                        icon = "boxes-packing",
+                        text = "Access Storage",
                         event = "Properties:Client:Stash",
-                        canInteract = function(data)
+                        isEnabled = function(data)
                             if _insideProperty and _propertiesLoaded then
                                 local property = _properties[_insideProperty.id]
-                                local key = property.keys and property.keys[LocalPlayer.state.Character:GetData("ID")]
-                                return (key ~= nil and (((key.Permissions and key.Permissions.stash) and true) or key.Owner)) or
-                                    LocalPlayer.state.onDuty == "police"
+                                return (property.keys ~= nil and property.keys[plsr.State.character.ID] ~= nil and (property.keys[plsr.State.character.ID].Permissions?.stash or property.keys[plsr.State.character.ID].Owner)) or plsr.State.flags.onDuty == "police"
                             end
                         end,
                     })
 
                     table.insert(menu, {
-                        icon = "clothes-hanger",
-                        label = "Open Wardrobe",
-                        onSelect = function()
-                            TriggerEvent("Properties:Client:Closet")
-                        end,
+                        icon = "shirt",
+                        text = "Open Wardrobe",
+                        event = "Properties:Client:Closet",
                     })
                 elseif furnData.cat == "beds" then
                     icon = "bed"
 
                     table.insert(menu, {
                         icon = "bed",
-                        label = "Logout",
+                        text = "Logout",
                         event = "Properties:Client:Logout",
-                        canInteract = function(data)
+                        isEnabled = function(data)
                             if _insideProperty and _propertiesLoaded then
                                 local property = _properties[_insideProperty.id]
-                                return property.keys ~= nil and
-                                    property.keys[LocalPlayer.state.Character:GetData("ID")] ~= nil
+                                return property.keys ~= nil and property.keys[plsr.State.character.ID] ~= nil
                             end
                         end,
                     })
@@ -122,7 +114,7 @@ function PlaceFurniture(v)
 
                 hasTargeting = true
 
-                exports.ox_target:addEntity(obj, menu)
+                plsr.Targeting:AddEntity(obj, icon, menu)
             end
         end
 
@@ -133,42 +125,39 @@ function PlaceFurniture(v)
             targeting = hasTargeting,
         })
 
-        if LocalPlayer.state.furnitureEdit and not hasTargeting then
-            exports.ox_target:addEntity(obj, {
+        if plsr.State.flags.furnitureEdit and not hasTargeting then
+            plsr.Targeting:AddEntity(obj, "square", {
                 {
                     icon = "arrows-up-down-left-right",
-                    label = "Move",
-                    onSelect = function()
-                        TriggerEvent("Furniture:Client:OnMove", {
-                            id = v.id,
-                        })
-                    end,
+                    text = "Move",
+                    event = "Furniture:Client:OnMove",
+                    data = {
+                        id = v.id,
+                    },
                 },
                 {
                     icon = "trash",
-                    label = "Delete",
-                    onSelect = function()
-                        TriggerEvent("Furniture:Client:OnDelete", {
-                            id = v.id,
-                        })
-                    end,
+                    text = "Delete",
+                    event = "Furniture:Client:OnDelete",
+                    data = {
+                        id = v.id,
+                    },
                 },
                 {
                     icon = "clone",
-                    label = "Clone",
-                    onSelect = function()
-                        TriggerEvent("Furniture:Client:OnClone", {
-                            id = v.id,
-                            model = v.model,
-                        })
-                    end,
+                    text = "Clone",
+                    event = "Furniture:Client:OnClone",
+                    data = {
+                        id = v.id,
+                        model = v.model,
+                    },
                 },
             })
         end
 
         Wait(1)
     else
-        exports["pulsar-hud"]:Notification("error", "Failed to Load Model: " .. v.model)
+       print("Failed to Load Model: " .. v.model)
     end
 end
 
@@ -177,7 +166,7 @@ function DestroyFurniture(s)
         for k, v in ipairs(_spawnedFurniture) do
             DeleteEntity(v.entity)
             if not s then
-                exports.ox_target:removeEntity(v.entity)
+                plsr.Targeting:RemoveEntity(v.entity)
             end
         end
 
@@ -190,56 +179,48 @@ function SetFurnitureEditMode(state)
         if state then
             for k, v in ipairs(_spawnedFurniture) do
                 if not v.targeting then
-                    exports.ox_target:addEntity(v.entity, {
+                    plsr.Targeting:AddEntity(v.entity, "square", {
                         {
                             icon = "arrows-up-down-left-right",
-                            label = "Move",
-                            onSelect = function()
-                                TriggerEvent("Furniture:Client:OnMove", {
-                                    id = v.id,
-                                })
-                            end,
+                            text = "Move",
+                            event = "Furniture:Client:OnMove",
+                            data = {
+                                id = v.id,
+                            },
                         },
                         {
                             icon = "trash",
-                            label = "Delete",
-                            onSelect = function()
-                                TriggerEvent("Furniture:Client:OnDelete", {
-                                    id = v.id,
-                                })
-                            end,
+                            text = "Delete",
+                            event = "Furniture:Client:OnDelete",
+                            data = {
+                                id = v.id,
+                            },
                         },
                         {
                             icon = "clone",
-                            label = "Clone",
-                            onSelect = function()
-                                TriggerEvent("Furniture:Client:OnClone", {
-                                    id = v.id,
-                                    model = v.model,
-                                })
-                            end,
+                            text = "Clone",
+                            event = "Furniture:Client:OnClone",
+                            data = {
+                                id = v.id,
+                                model = v.model,
+                            },
                         },
                     })
                 end
             end
 
-            exports["pulsar-hud"]:Notification("standard",
-                "Furniture Edit Mode Enabled - Third Eye Objects to Move or Delete Them",
-                -1,
-                nil,
-                nil,
-                "furniture")
+            plsr.Notification.Persistent:Standard("furniture", "Furniture Edit Mode Enabled - Third Eye Objects to Move or Delete Them")
         else
             for k, v in ipairs(_spawnedFurniture) do
                 if not v.targeting then
-                    exports.ox_target:removeEntity(v.entity)
+                    plsr.Targeting:RemoveEntity(v.entity)
                 end
             end
 
-            exports["pulsar-hud"]:Notification("remove", nil, nil, nil, nil, "furniture")
+            plsr.Notification.Persistent:Remove("furniture")
         end
 
-        LocalPlayer.state.furnitureEdit = state
+        plsr.State.flags.furnitureEdit = state
     end
 end
 
@@ -250,30 +231,27 @@ function CycleFurniture(direction)
 
     if direction then
         if _furnitureCategoryCurrent < #_furnitureCategory then
-            _furnitureCategoryCurrent = _furnitureCategoryCurrent + 1
+            _furnitureCategoryCurrent += 1
         else
             return
         end
     else
         if _furnitureCategoryCurrent > 1 then
-            _furnitureCategoryCurrent = _furnitureCategoryCurrent - 1
+            _furnitureCategoryCurrent -= 1
         else
             return
         end
     end
 
-    exports['pulsar-hud']:InfoOverlayClose()
-    exports['pulsar-objects']:PlacerCancel(true, true)
+    plsr.InfoOverlay:Close()
+    plsr.ObjectPlacer:Cancel(true, true)
     Wait(200)
     local fKey = _furnitureCategory[_furnitureCategoryCurrent]
     local fData = FurnitureConfig[fKey]
     if fData then
-        exports['pulsar-hud']:InfoOverlayShow(fData.name,
-            string.format("Category: %s | Model: %s",
-                (FurnitureCategories[fData.cat] and FurnitureCategories[fData.cat].name or "Unknown"), fKey))
+        plsr.InfoOverlay:Show(fData.name, string.format("Category: %s | Model: %s", FurnitureCategories[fData.cat]?.name or "Unknown", fKey))
     end
-    exports['pulsar-objects']:PlacerStart(GetHashKey(fKey), "Furniture:Client:Place", {}, true,
-        "Furniture:Client:Cancel", true, true)
+    plsr.ObjectPlacer:Start(GetHashKey(fKey), "Furniture:Client:Place", {}, true, "Furniture:Client:Cancel", true, true)
 end
 
 AddEventHandler("Furniture:Client:Place", function(data, placement)
@@ -283,7 +261,7 @@ AddEventHandler("Furniture:Client:Place", function(data, placement)
             model = _placingSearchItem
         end
 
-        exports["pulsar-core"]:ServerCallback("Properties:PlaceFurniture", {
+        plsr.Callbacks:ServerCallback("Properties:PlaceFurniture", {
             model = model,
             coords = {
                 x = placement.coords.x,
@@ -298,17 +276,17 @@ AddEventHandler("Furniture:Client:Place", function(data, placement)
             data = data,
         }, function(success)
             if success then
-                exports["pulsar-hud"]:Notification("success", "Placed Item")
+                plsr.Notification:Success("Placed Item")
             else
-                exports["pulsar-hud"]:Notification("error", "Unable to Place Furniture")
+                plsr.Notification:Error("Error")
             end
 
             _placingFurniture = false
-            LocalPlayer.state.placingFurniture = false
-            exports['pulsar-hud']:InfoOverlayClose()
+            plsr.State.flags.placingFurniture = false
+            plsr.InfoOverlay:Close()
 
             if not _skipPhone then
-                exports['pulsar-phone']:Open()
+                plsr.Phone:Open()
             end
         end)
     end
@@ -318,21 +296,22 @@ end)
 AddEventHandler("Furniture:Client:Cancel", function()
     if _placingFurniture then
         _placingFurniture = false
-        LocalPlayer.state.placingFurniture = false
+        plsr.State.flags.placingFurniture = false
 
         if not _skipPhone then
-            exports['pulsar-phone']:Open()
+            plsr.Phone:Open()
         end
 
         Wait(200)
         DisablePauseMenu(false)
-        exports['pulsar-hud']:InfoOverlayClose()
+        plsr.InfoOverlay:Close()
     end
 end)
 
 AddEventHandler("Furniture:Client:Move", function(data, placement)
     if _placingFurniture and data.id then
-        exports["pulsar-core"]:ServerCallback("Properties:MoveFurniture", {
+
+        plsr.Callbacks:ServerCallback("Properties:MoveFurniture", {
             id = data.id,
             coords = {
                 x = placement.coords.x,
@@ -346,17 +325,17 @@ AddEventHandler("Furniture:Client:Move", function(data, placement)
             },
         }, function(success)
             if success then
-                exports["pulsar-hud"]:Notification("success", "Moved Item")
+                plsr.Notification:Success("Moved Item")
             else
-                exports["pulsar-hud"]:Notification("error", "Unable to Move Furniture")
+                plsr.Notification:Error("Error")
             end
 
             _placingFurniture = false
-            LocalPlayer.state.placingFurniture = false
-            exports['pulsar-hud']:InfoOverlayClose()
+            plsr.State.flags.placingFurniture = false
+            plsr.InfoOverlay:Close()
 
             if not _skipPhone then
-                exports['pulsar-phone']:Open()
+                plsr.Phone:Open()
             end
         end)
     end
@@ -373,11 +352,11 @@ AddEventHandler("Furniture:Client:CancelMove", function(data)
             end
         end
 
-        exports["pulsar-hud"]:Notification("error", "Move Cancelled")
+        plsr.Notification:Error("Move Cancelled")
         _placingFurniture = false
-        LocalPlayer.state.placingFurniture = false
+        plsr.State.flags.placingFurniture = false
         if not _skipPhone then
-            exports['pulsar-phone']:Open()
+            plsr.Phone:Open()
         end
 
         Wait(200)
@@ -394,12 +373,13 @@ end)
 
 RegisterNetEvent("Furniture:Client:MoveItem", function(property, id, item)
     if _insideProperty and _insideProperty.id == property and _spawnedFurniture then
+
         local ns = {}
         local shouldUpdate = false
         for k, v in ipairs(_spawnedFurniture) do
             if v.id == id then
                 DeleteEntity(v.entity)
-                exports.ox_target:removeEntity(v.entity)
+                plsr.Targeting:RemoveEntity(v.entity)
                 shouldUpdate = true
             else
                 table.insert(ns, v)
@@ -426,7 +406,7 @@ RegisterNetEvent("Furniture:Client:DeleteItem", function(property, id, furniture
         for k, v in ipairs(_spawnedFurniture) do
             if v.id == id then
                 DeleteEntity(v.entity)
-                exports.ox_target:removeEntity(v.entity)
+                plsr.Targeting:RemoveEntity(v.entity)
             else
                 table.insert(ns, v)
             end
@@ -438,16 +418,15 @@ RegisterNetEvent("Furniture:Client:DeleteItem", function(property, id, furniture
 end)
 
 AddEventHandler("Furniture:Client:OnMove", function(entity, data)
-    exports['pulsar-properties']:Move(data.id, true)
+    plsr.Properties.Furniture:Move(data.id, true)
 end)
 
 AddEventHandler("Furniture:Client:OnDelete", function(entity, data)
-    exports['pulsar-properties']:Delete(data.id)
+    plsr.Properties.Furniture:Delete(data.id)
 end)
 
 AddEventHandler("Furniture:Client:OnClone", function(entity, data)
-    exports['pulsar-properties']:Place(data.model, false, {}, false, true, GetEntityCoords(entity.entity),
-        GetEntityRotation(entity.entity))
+    plsr.Properties.Furniture:Place(data.model, false, {}, false, true, GetEntityCoords(entity.entity), GetEntityRotation(entity.entity))
 end)
 
 AddEventHandler('onResourceStop', function(resourceName)
@@ -463,11 +442,11 @@ function DisablePauseMenu(state)
         _disablePause = state
         if _disablePause then
             CreateThread(function()
-                while _disablePause do
-                    DisableControlAction(0, 200, true)
-                    Wait(1)
-                end
-            end)
+				while _disablePause do
+					DisableControlAction(0, 200, true)
+					Wait(1)
+				end
+			end)
         end
     end
 end

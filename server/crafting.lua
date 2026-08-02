@@ -5,9 +5,9 @@ _propertyCraftingRecipies = {
 		result = { name = "WEAPON_PISTOL", count = 1 },
 		items = {
 			{ name = "scrapmetal", count = 4 },
-			{ name = "rubber",     count = 5 },
+			{ name = "rubber", count = 5 },
 			{ name = "heavy_glue", count = 2 },
-			{ name = "plastic",    count = 4 },
+			{ name = "plastic", count = 4 },
 		},
 		time = 10 * 1000,
 	},
@@ -15,9 +15,9 @@ _propertyCraftingRecipies = {
 		result = { name = "WEAPON_FNX", count = 1 },
 		items = {
 			{ name = "scrapmetal", count = 4 },
-			{ name = "rubber",     count = 5 },
+			{ name = "rubber", count = 5 },
 			{ name = "heavy_glue", count = 2 },
-			{ name = "plastic",    count = 4 },
+			{ name = "plastic", count = 4 },
 			{ name = "copperwire", count = 3 },
 		},
 		time = 10 * 1000,
@@ -26,10 +26,10 @@ _propertyCraftingRecipies = {
 		result = { name = "WEAPON_HEAVYPISTOL", count = 1 },
 		items = {
 			{ name = "scrapmetal", count = 5 },
-			{ name = "ironbar",    count = 3 },
-			{ name = "rubber",     count = 8 },
+			{ name = "ironbar", count = 3 },
+			{ name = "rubber", count = 8 },
 			{ name = "heavy_glue", count = 4 },
-			{ name = "plastic",    count = 6 },
+			{ name = "plastic", count = 6 },
 			{ name = "copperwire", count = 8 },
 		},
 		time = 10 * 1000,
@@ -38,10 +38,10 @@ _propertyCraftingRecipies = {
 		result = { name = "WEAPON_APPISTOL", count = 1 },
 		items = {
 			{ name = "scrapmetal", count = 5 },
-			{ name = "ironbar",    count = 3 },
-			{ name = "rubber",     count = 8 },
+			{ name = "ironbar", count = 3 },
+			{ name = "rubber", count = 8 },
 			{ name = "heavy_glue", count = 4 },
-			{ name = "plastic",    count = 6 },
+			{ name = "plastic", count = 6 },
 			{ name = "copperwire", count = 8 },
 		},
 		time = 20 * 1000,
@@ -72,15 +72,15 @@ _propertyCraftingRecipies = {
 		result = { name = "WEAPON_MOLOTOV", count = 1 },
 		items = {
 			{ name = "whiskey", count = 1 },
-			{ name = "cloth",   count = 1 },
+			{ name = "cloth", count = 1 },
 		},
 		time = 2000,
 	},
 	["thermite"] = {
 		result = { name = "thermite", count = 1 },
 		items = {
-			{ name = "scrapmetal",       count = 250 },
-			{ name = "ironbar",          count = 50 },
+			{ name = "scrapmetal", count = 250 },
+			{ name = "ironbar", count = 50 },
 			{ name = "electronic_parts", count = 75 },
 		},
 		time = 1000,
@@ -88,52 +88,52 @@ _propertyCraftingRecipies = {
 	["ATTCH_PISTOL_EXT_MAG"] = {
 		result = { name = "ATTCH_PISTOL_EXT_MAG", count = 1 },
 		items = {
-			{ name = "ironbar",    count = 1 },
+			{ name = "ironbar", count = 1 },
 			{ name = "heavy_glue", count = 5 },
-			{ name = "plastic",    count = 15 },
+			{ name = "plastic", count = 15 },
 		},
 		time = 5000,
 	},
 	["safecrack_kit"] = {
 		result = { name = "safecrack_kit", count = 1 },
 		items = {
-			{ name = "ironbar",    count = 5 },
+			{ name = "ironbar", count = 5 },
 			{ name = "heavy_glue", count = 1 },
-			{ name = "plastic",    count = 4 },
+			{ name = "plastic", count = 4 },
 		},
 		time = 5000,
 	},
 	["electronics_kit"] = {
 		result = { name = "electronics_kit", count = 1 },
 		items = {
-			{ name = "goldbar",          count = 2 },
+			{ name = "goldbar", count = 2 },
 			{ name = "electronic_parts", count = 5 },
-			{ name = "heavy_glue",       count = 1 },
-			{ name = "plastic",          count = 4 },
-			{ name = "copperwire",       count = 3 },
+			{ name = "heavy_glue", count = 1 },
+			{ name = "plastic", count = 4 },
+			{ name = "copperwire", count = 3 },
 		},
 		time = 5000,
 	},
 	["adv_electronics_kit"] = {
 		result = { name = "adv_electronics_kit", count = 1 },
 		items = {
-			{ name = "goldbar",          count = 1 },
-			{ name = "silverbar",        count = 2 },
+			{ name = "goldbar", count = 1 },
+			{ name = "silverbar", count = 2 },
 			{ name = "electronic_parts", count = 30 },
-			{ name = "heavy_glue",       count = 5 },
-			{ name = "plastic",          count = 30 },
-			{ name = "copperwire",       count = 20 },
+			{ name = "heavy_glue", count = 5 },
+			{ name = "plastic", count = 30 },
+			{ name = "copperwire", count = 20 },
 		},
 		time = 5000,
 	},
 	["vpn"] = {
 		result = { name = "vpn", count = 1 },
 		items = {
-			{ name = "silverbar",        count = 2 },
+			{ name = "silverbar", count = 2 },
 			{ name = "electronic_parts", count = 3 },
-			{ name = "glue",             count = 1 },
-			{ name = "plastic",          count = 4 },
-			{ name = "copperwire",       count = 3 },
+			{ name = "glue", count = 1 },
+			{ name = "plastic", count = 4 },
+			{ name = "copperwire", count = 3 },
 		},
 		time = 5000,
 	}
@@ -154,7 +154,7 @@ _propertyCrafting = {
 			{
 				result = { name = "fakeplates", count = 2 },
 				items = {
-					{ name = "plastic",    count = 1 },
+					{ name = "plastic", count = 1 },
 					{ name = "scrapmetal", count = 1 },
 				},
 				time = 10000,
@@ -294,7 +294,7 @@ _propertyCrafting = {
 			{
 				result = { name = "fakeplates", count = 2 },
 				items = {
-					{ name = "plastic",    count = 1 },
+					{ name = "plastic", count = 1 },
 					{ name = "scrapmetal", count = 1 },
 				},
 				time = 10000,
@@ -472,10 +472,8 @@ _propertyCrafting = {
 }
 
 function SetupPropertyCrafting()
-	for k = 1, #_propertyCrafting do
-		local v = _propertyCrafting[k]
-		exports.ox_inventory:CraftingRegisterBench("property-" .. v.id, false, false, false, v.restrictions,
-			v.recipies, v.canUseSchematics)
+	for k, v in ipairs(_propertyCrafting) do
+		plsr.Crafting:RegisterBench("property-" .. v.id, false, false, false, v.restrictions, v.recipies, v.canUseSchematics)
 		GlobalState[string.format("Property:Crafting:%s", v.id)] = {
 			crafting = true,
 			schematics = v.canUseSchematics,

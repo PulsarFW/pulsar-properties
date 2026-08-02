@@ -7,5 +7,5 @@ function LoadModel(model)
 		attempts += 1
 	end
 
-	return HasModelLoaded(model)
+    return HasModelLoaded(model)
 end
